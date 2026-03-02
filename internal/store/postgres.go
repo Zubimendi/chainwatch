@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/yourusername/chainwatch/internal/detector"
+	"github.com/Zubimendi/chainwatch/internal/detector"
 )
 
 // Store wraps the Postgres connection pool and exposes

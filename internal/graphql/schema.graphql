@@ -1,0 +1,35 @@
+type Alert {
+  id: String!
+  type: String!
+  severity: String!
+  title: String!
+  description: String!
+  transactionHash: String
+  fromAddress: String
+  toAddress: String
+  valueEth: Float
+  gasPriceGwei: Float
+  blockNumber: Int
+  triggeredRule: String!
+  detectedAt: String!
+}
+
+type WatchedAddress {
+  address: String!
+  label: String
+  addedAt: String!
+}
+
+type Query {
+  alerts(limit: Int, severity: String): [Alert!]!
+  watchedAddresses: [WatchedAddress!]!
+}
+
+type Mutation {
+  addWatch(address: String!, label: String): Boolean!
+  addWebhook(url: String!, secret: String, minSeverity: String): Boolean!
+}
+
+type Subscription {
+  alertFired: Alert!
+}

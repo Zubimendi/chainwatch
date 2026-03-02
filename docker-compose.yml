@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: chainwatch
+      POSTGRES_PASSWORD: chainwatch
+      POSTGRES_DB: chainwatch
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chainwatch"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+
+  chainwatch:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      CHAINWATCH_NODE_WS_URL: ${CHAINWATCH_NODE_WS_URL:-ws://host.docker.internal:8545}
+      CHAINWATCH_DATABASE_URL: postgres://chainwatch:chainwatch@postgres:5432/chainwatch?sslmode=disable
+      CHAINWATCH_REDIS_URL: redis://redis:6379
+      CHAINWATCH_LARGE_TRANSFER_ETH: "10"
+      CHAINWATCH_GRAPHQL_PORT: "8080"
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
+  redisdata:
